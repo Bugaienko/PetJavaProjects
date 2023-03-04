@@ -9,6 +9,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -16,7 +17,7 @@ import java.util.List;
  */
 
 public class ChatServer {
-    private static final Logger LOGGER  = LogManager.getLogger(ChatServer.class);
+    private static final Logger LOGGER = LogManager.getLogger(ChatServer.class);
     private List<User> users;
     public static int SERVER_PORT = 512;
 
@@ -27,6 +28,7 @@ public class ChatServer {
     public final static String AUTH_CMD = "/auth";
     public final static String PASS_CHANGE_CMD = "/pass";
     public static String GET_NAME_CMD = "/clnm";
+    private boolean isCommandExit = false;
 
     private DbHandler dbHandler;
 
@@ -126,34 +128,19 @@ public class ChatServer {
                     send(sb2.toString());
                     message = reader.readLine();
                     String[] strings = message.split(" ");
-                    if (strings.length >= 3 && strings[0].equals(AUTH_CMD)) {
-                        String clientName = strings[1];
-                        String clientPass = strings[2];
-                        User tempUser = dbHandler.checkName(clientName);
-                        if (tempUser == null) {
-                            dbHandler.addNewUser(clientName, clientPass);
-                            isAuthorized = true;
-                            user = dbHandler.checkName(clientName);
-                            users = dbHandler.getAllUsers();
-                            send(clientName + ", you have successfully registered\n");
-
-                        } else {
-                            if (checkPass(clientPass, tempUser)) {
-                                user = tempUser;
-                                isAuthorized = true;
-                                send(clientName + ", you have successfully logged in\n");
-                            } else {
-                                StringBuilder sb3 = new StringBuilder("User with the same name already exists.\n");
-                                sb3.append("Please enter a valid password or select a different username\n");
-                                send(sb3.toString());
-                            }
-                        }
+                    isCommandExit = message.equalsIgnoreCase(EXIT_CMD);
+                    if (!isCommandExit) {
+                        waitingAuthorization(strings);
+                    } else {
+                        isAuthorized = true;
                     }
                 } while (!isAuthorized);
+                if (!isCommandExit) {
                 name = user.getName();
                 send(GET_NAME_CMD + " " + name);
+                }
                 do {
-                    message = reader.readLine();
+                    if (!isCommandExit) message = reader.readLine();
                     if (isCommandInMessage(message).length == 0) {
                         sendToAll(name, message);
                     }
@@ -162,18 +149,41 @@ public class ChatServer {
 
                 socket.close();
             } catch (IOException e) {
+                LOGGER.error("Cant close socket");
                 LOGGER.error(e);
 //                e.printStackTrace();
-            } finally {
-                try {
-                    socket.close();
-                } catch (IOException e) {
-                    LOGGER.error(e);
-                }
             }
             clients.remove(this);
             LOGGER.info(name + ": disconnected.");
 //            System.out.println(name + ": disconnected.");
+        }
+
+        private void waitingAuthorization(String[] strings) {
+            if (strings.length >= 3 && strings[0].equals(AUTH_CMD)) {
+                String clientName = strings[1];
+                String clientPass = strings[2];
+                User tempUser = dbHandler.checkName(clientName);
+                if (tempUser == null) {
+                    dbHandler.addNewUser(clientName, clientPass);
+                    isAuthorized = true;
+                    user = dbHandler.checkName(clientName);
+                    users = dbHandler.getAllUsers();
+                    LOGGER.info(clientName + " successfully registered");
+                    send(clientName + ", you have successfully registered\n");
+
+                } else {
+                    if (checkPass(clientPass, tempUser)) {
+                        user = tempUser;
+                        isAuthorized = true;
+                        LOGGER.info(clientName + " successfully logged in");
+                        send(clientName + ", you have successfully logged in\n");
+                    } else {
+                        StringBuilder sb3 = new StringBuilder("User with the same name already exists.\n");
+                        sb3.append("Please enter a valid password or select a different username\n");
+                        send(sb3.toString());
+                    }
+                }
+            }
         }
 
         private void send(String message) {
@@ -192,13 +202,14 @@ public class ChatServer {
             switch (strings[0]) {
                 case EXIT_CMD:
                     sendToAll(name, "left the chat");
+                    isCommandExit = true;
                     send(EXIT_CMD);
                     return strings;
                 case RENAME_CMD:
                     if (strings[1] != null) {
                         name = strings[1];
                         Boolean isNameChanged = dbHandler.changeName(user.getId(), name);
-                        send(isNameChanged? "You changed your name to: " + name : "Can't change name");
+                        send(isNameChanged ? "You changed your name to: " + name : "Can't change name");
                         if (isNameChanged) sendToAll(name, "My new name: " + name);
                     }
                     return strings;

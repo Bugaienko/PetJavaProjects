@@ -39,7 +39,7 @@ public class DbHandler {
 
     private void createTableUsers(Statement statement) {
         try {
-            statement.executeUpdate("CREATE TABLE users (\n" +
+            statement.executeUpdate("CREATE TABLE IF NOT EXISTS users (\n" +
                     "    id         INTEGER PRIMARY KEY AUTOINCREMENT\n" +
                     "                       UNIQUE\n" +
                     "                       NOT NULL,\n" +

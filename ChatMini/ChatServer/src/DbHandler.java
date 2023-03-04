@@ -1,4 +1,6 @@
 import org.sqlite.JDBC;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.sql.*;
@@ -11,6 +13,7 @@ import java.util.List;
  */
 
 public class DbHandler {
+    private static final Logger LOGGER = LogManager.getLogger(DbHandler.class);
     private static final String separator = File.separator;
 //    private static final String mainPath = separator + "JavaProCourse" + separator + "src" + separator + "homework30" + separator;
     private static final String mainPath = separator;
@@ -31,9 +34,11 @@ public class DbHandler {
             this.connection = DriverManager.getConnection(CON_STR);
             this.statement = this.connection.createStatement();
             createTableUsers(statement);
-            System.out.println("Connection done");
+            LOGGER.info("Connection done");
+//            System.out.println("Connection done");
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOGGER.fatal(e);
+//            e.printStackTrace();
         }
     }
 
@@ -47,8 +52,11 @@ public class DbHandler {
                     "    pass       TEXT    NOT NULL,\n" +
                     "    created_ad TEXT    DEFAULT (CURRENT_TIMESTAMP) \n" +
                     ");\n");
+            LOGGER.trace("Create table users");
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOGGER.fatal("Cant create Table user");
+            LOGGER.error(e);
+//            e.printStackTrace();
         }
     }
 
@@ -71,7 +79,8 @@ public class DbHandler {
             return users;
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOGGER.error(e);
+//            e.printStackTrace();
             return Collections.emptyList();
         }
     }
@@ -85,10 +94,13 @@ public class DbHandler {
             statement.setString(2, pass);
 
             statement.execute();
+            LOGGER.info("Add new user");
 
         } catch (SQLException e) {
-            e.printStackTrace();
-            System.out.println("add User to BD Error");
+            LOGGER.error("add User to BD Error");
+            LOGGER.fatal(e);
+//            e.printStackTrace();
+//            System.out.println("add User to BD Error");
         }
     }
 
@@ -118,10 +130,13 @@ public class DbHandler {
             statement1.setString(1, newName);
             statement1.setInt(2, id);
             statement1.executeUpdate();
+            LOGGER.trace("User changed name");
             return true;
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOGGER.error("Cant change client name");
+            LOGGER.error(e);
+//            e.printStackTrace();
         }
         return false;
     }
@@ -133,11 +148,14 @@ public class DbHandler {
             statement.setString(1, newPass);
             statement.setInt(2, id);
             statement.executeUpdate();
+            LOGGER.trace("User changed pass");
             return true;
 
         } catch (SQLException e) {
-            e.printStackTrace();
-            System.out.println("Cant pass Update");
+            LOGGER.error("Cant pass Update");
+            LOGGER.error(e);
+//            e.printStackTrace();
+//            System.out.println("Cant pass Update");
         }
         return false;
     }

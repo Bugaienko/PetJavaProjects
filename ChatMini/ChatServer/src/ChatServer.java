@@ -1,3 +1,6 @@
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -13,6 +16,7 @@ import java.util.List;
  */
 
 public class ChatServer {
+    private static final Logger LOGGER  = LogManager.getLogger(ChatServer.class);
     private List<User> users;
     public static int SERVER_PORT = 512;
 
@@ -38,14 +42,19 @@ public class ChatServer {
         try {
             dbHandler = DbHandler.getInstance();
             users = dbHandler.getAllUsers();
-            for (User user : users) {
-                System.out.println(user);
-            }
-            System.out.println("Connection to BD done");
+
+//            for (User user : users) {
+//                System.out.println(user);
+//            }
+
+            LOGGER.info("Connection to BD done");
+//            System.out.println("Connection to BD done");
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOGGER.error(e);
+//            e.printStackTrace();
         }
-        System.out.println("Server started...");
+        LOGGER.info("Server started...");
+//        System.out.println("Server started...");
         try (ServerSocket server = new ServerSocket(SERVER_PORT)) {
             while (true) {
                 Socket socket = server.accept();
@@ -53,10 +62,12 @@ public class ChatServer {
                 ClientHandler client = new ClientHandler(socket, name, dbHandler);
                 clients.add(client);
                 new Thread(client).start();
-                System.out.println(name + ": joined.");
+                LOGGER.info(name + ": joined.");
+//                System.out.println(name + ": joined.");
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error(e);
+//            e.printStackTrace();
         }
     }
 
@@ -87,15 +98,17 @@ public class ChatServer {
 //            dbHandler.addNewUser(name, "1234");
 //            System.out.println("user create");
             users = dbHandler.getAllUsers();
-            for (User user : users) {
-                System.out.println(user);
-            }
+
+//            for (User user : users) {
+//                System.out.println(user);
+//            }
 
             try {
                 reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                 writer = new PrintWriter(socket.getOutputStream());
             } catch (IOException e) {
-                e.printStackTrace();
+                LOGGER.error(e);
+//                e.printStackTrace();
             }
         }
 
@@ -142,22 +155,25 @@ public class ChatServer {
                 do {
                     message = reader.readLine();
                     if (isCommandInMessage(message).length == 0) {
-//                        if (message.equals(EXIT_CMD)) {
-//                            sendToAll(name, "left the chat");
-//                            send(EXIT_CMD);
-//                        } else {
                         sendToAll(name, message);
-//                        }
                     }
-                    System.out.println(name + ": " + message);
+//                    System.out.println(name + ": " + message);
                 } while (!message.equalsIgnoreCase(EXIT_CMD));
 
                 socket.close();
             } catch (IOException e) {
-                e.printStackTrace();
+                LOGGER.error(e);
+//                e.printStackTrace();
+            } finally {
+                try {
+                    socket.close();
+                } catch (IOException e) {
+                    LOGGER.error(e);
+                }
             }
             clients.remove(this);
-            System.out.println(name + ": disconnected.");
+            LOGGER.info(name + ": disconnected.");
+//            System.out.println(name + ": disconnected.");
         }
 
         private void send(String message) {
@@ -208,7 +224,7 @@ public class ChatServer {
                     return strings;
                 case PASS_CHANGE_CMD:
                     String newPass = strings[1];
-                    System.out.println("newPass: " + newPass);
+//                    System.out.println("newPass: " + newPass);
                     if (newPass != null) {
                         boolean isChanged = dbHandler.changePass(user.getId(), newPass);
                         send(isChanged ? "Password was changed" : "Can not change password");

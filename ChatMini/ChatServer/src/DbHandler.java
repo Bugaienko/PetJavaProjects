@@ -109,6 +109,22 @@ public class DbHandler {
         return (user.getPassword().equals(pass));
     }
 
+    public boolean changeName(int id, String newName) {
+        String query = "UPDATE users SET name = ? WHERE id = ?";
+        try(PreparedStatement statement1 = this.connection.prepareStatement(
+                query
+        ))
+        {
+            statement1.setString(1, newName);
+            statement1.setInt(2, id);
+            statement1.executeUpdate();
+            return true;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
     public boolean changePass(int id, String newPass) {
         String query = "UPDATE users SET pass = ? WHERE id = ?";
         try(PreparedStatement statement = this.connection.prepareStatement(

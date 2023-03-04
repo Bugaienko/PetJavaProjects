@@ -181,8 +181,9 @@ public class ChatServer {
                 case RENAME_CMD:
                     if (strings[1] != null) {
                         name = strings[1];
-                        send("You changed your name to: " + name);
-                        sendToAll(name, "My new name: " + name);
+                        Boolean isNameChanged = dbHandler.changeName(user.getId(), name);
+                        send(isNameChanged? "You changed your name to: " + name : "Can't change name");
+                        if (isNameChanged) sendToAll(name, "My new name: " + name);
                     }
                     return strings;
                 case USERS_SHOW_CMD:

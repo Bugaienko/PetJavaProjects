@@ -13,10 +13,11 @@ import java.util.List;
 public class DbHandler {
     private static final String separator = File.separator;
 //    private static final String mainPath = separator + "JavaProCourse" + separator + "src" + separator + "homework30" + separator;
-    private static final String mainPath ="src" + separator;
+    private static final String mainPath = separator;
     private static final String CON_STR = "jdbc:sqlite:" +  mainPath + "db1.db";
     private static DbHandler instance = null;
     private Connection connection;
+    private Statement statement;
     public static synchronized DbHandler getInstance() throws SQLException {
         if (instance == null) {
             instance = new DbHandler();
@@ -28,7 +29,24 @@ public class DbHandler {
         try {
             DriverManager.registerDriver(new JDBC());
             this.connection = DriverManager.getConnection(CON_STR);
+            this.statement = this.connection.createStatement();
+            createTableUsers(statement);
             System.out.println("Connection done");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void createTableUsers(Statement statement) {
+        try {
+            statement.executeUpdate("CREATE TABLE users (\n" +
+                    "    id         INTEGER PRIMARY KEY AUTOINCREMENT\n" +
+                    "                       UNIQUE\n" +
+                    "                       NOT NULL,\n" +
+                    "    name       TEXT    NOT NULL,\n" +
+                    "    pass       TEXT    NOT NULL,\n" +
+                    "    created_ad TEXT    DEFAULT (CURRENT_TIMESTAMP) \n" +
+                    ");\n");
         } catch (SQLException e) {
             e.printStackTrace();
         }

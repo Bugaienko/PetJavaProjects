@@ -9,7 +9,6 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -44,19 +43,11 @@ public class ChatServer {
         try {
             dbHandler = DbHandler.getInstance();
             users = dbHandler.getAllUsers();
-
-//            for (User user : users) {
-//                System.out.println(user);
-//            }
-
             LOGGER.info("Connection to BD done");
-//            System.out.println("Connection to BD done");
         } catch (SQLException e) {
             LOGGER.error(e);
-//            e.printStackTrace();
         }
         LOGGER.info("Server started...");
-//        System.out.println("Server started...");
         try (ServerSocket server = new ServerSocket(SERVER_PORT)) {
             while (true) {
                 Socket socket = server.accept();
@@ -65,11 +56,9 @@ public class ChatServer {
                 clients.add(client);
                 new Thread(client).start();
                 LOGGER.info(name + ": joined.");
-//                System.out.println(name + ": joined.");
             }
         } catch (IOException e) {
             LOGGER.error(e);
-//            e.printStackTrace();
         }
     }
 
@@ -96,21 +85,13 @@ public class ChatServer {
             this.dbHandler = dbHandler;
             isAuthorized = false;
 
-//
-//            dbHandler.addNewUser(name, "1234");
-//            System.out.println("user create");
             users = dbHandler.getAllUsers();
-
-//            for (User user : users) {
-//                System.out.println(user);
-//            }
 
             try {
                 reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                 writer = new PrintWriter(socket.getOutputStream());
             } catch (IOException e) {
                 LOGGER.error(e);
-//                e.printStackTrace();
             }
         }
 
@@ -136,26 +117,23 @@ public class ChatServer {
                     }
                 } while (!isAuthorized);
                 if (!isCommandExit) {
-                name = user.getName();
-                send(GET_NAME_CMD + " " + name);
+                    name = user.getName();
+                    send(GET_NAME_CMD + " " + name);
                 }
                 do {
                     if (!isCommandExit) message = reader.readLine();
                     if (isCommandInMessage(message).length == 0) {
                         sendToAll(name, message);
                     }
-//                    System.out.println(name + ": " + message);
                 } while (!message.equalsIgnoreCase(EXIT_CMD));
 
                 socket.close();
             } catch (IOException e) {
                 LOGGER.error("Cant close socket");
                 LOGGER.error(e);
-//                e.printStackTrace();
             }
             clients.remove(this);
             LOGGER.info(name + ": disconnected.");
-//            System.out.println(name + ": disconnected.");
         }
 
         private void waitingAuthorization(String[] strings) {
@@ -235,7 +213,7 @@ public class ChatServer {
                     return strings;
                 case PASS_CHANGE_CMD:
                     String newPass = strings[1];
-//                    System.out.println("newPass: " + newPass);
+                    LOGGER.info(user.getName() + "changed password");
                     if (newPass != null) {
                         boolean isChanged = dbHandler.changePass(user.getId(), newPass);
                         send(isChanged ? "Password was changed" : "Can not change password");
@@ -247,6 +225,5 @@ public class ChatServer {
 
             }
         }
-
     }
 }

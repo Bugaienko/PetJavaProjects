@@ -15,12 +15,13 @@ import java.util.List;
 public class DbHandler {
     private static final Logger LOGGER = LogManager.getLogger(DbHandler.class);
     private static final String separator = File.separator;
-//    private static final String mainPath = separator + "JavaProCourse" + separator + "src" + separator + "homework30" + separator;
+    //    private static final String mainPath = separator + "JavaProCourse" + separator + "src" + separator + "homework30" + separator;
     private static final String mainPath = separator;
-    private static final String CON_STR = "jdbc:sqlite:" +  mainPath + "db1.db";
+    private static final String CON_STR = "jdbc:sqlite:" + mainPath + "db1.db";
     private static DbHandler instance = null;
     private Connection connection;
     private Statement statement;
+
     public static synchronized DbHandler getInstance() throws SQLException {
         if (instance == null) {
             instance = new DbHandler();
@@ -35,34 +36,30 @@ public class DbHandler {
             this.statement = this.connection.createStatement();
             createTableUsers(statement);
             LOGGER.info("Connection done");
-//            System.out.println("Connection done");
         } catch (SQLException e) {
             LOGGER.fatal(e);
-//            e.printStackTrace();
         }
     }
 
     private void createTableUsers(Statement statement) {
         try {
-            statement.executeUpdate("CREATE TABLE IF NOT EXISTS users (\n" +
-                    "    id         INTEGER PRIMARY KEY AUTOINCREMENT\n" +
-                    "                       UNIQUE\n" +
-                    "                       NOT NULL,\n" +
-                    "    name       TEXT    NOT NULL,\n" +
-                    "    pass       TEXT    NOT NULL,\n" +
-                    "    created_ad TEXT    DEFAULT (CURRENT_TIMESTAMP) \n" +
-                    ");\n");
+            statement.executeUpdate("CREATE TABLE IF NOT EXISTS users (" +
+                    "id INTEGER PRIMARY KEY AUTOINCREMENT" +
+                    "UNIQUE" +
+                    "NOT NULL," +
+                    "name TEXT NOT NULL," +
+                    "pass TEXT NOT NULL," +
+                    "created_ad TEXT DEFAULT (CURRENT_TIMESTAMP) " +
+                    ");");
             LOGGER.trace("Create table users");
         } catch (SQLException e) {
             LOGGER.fatal("Cant create Table user");
             LOGGER.error(e);
-//            e.printStackTrace();
         }
     }
 
     public List<User> getAllUsers() {
-        try(Statement statement = this.connection.createStatement())
-        {
+        try (Statement statement = this.connection.createStatement()) {
             List<User> users = new ArrayList<>();
             ResultSet res = statement.executeQuery(
                     "SELECT id, name, pass FROM users"
@@ -80,12 +77,11 @@ public class DbHandler {
 
         } catch (SQLException e) {
             LOGGER.error(e);
-//            e.printStackTrace();
             return Collections.emptyList();
         }
     }
 
-    public void addNewUser (String name, String pass) {
+    public void addNewUser(String name, String pass) {
         try (PreparedStatement statement = this.connection.prepareStatement(
                 "INSERT INTO users('name', 'pass') " +
                         "VALUES (?, ?)"
@@ -99,21 +95,19 @@ public class DbHandler {
         } catch (SQLException e) {
             LOGGER.error("add User to BD Error");
             LOGGER.fatal(e);
-//            e.printStackTrace();
-//            System.out.println("add User to BD Error");
         }
     }
 
-    public User checkName (String name) {
-            List<User> users = getAllUsers();
-            if (users.isEmpty()) {
-                return null;
+    public User checkName(String name) {
+        List<User> users = getAllUsers();
+        if (users.isEmpty()) {
+            return null;
+        }
+        for (User user : users) {
+            if (user.getName().equals(name)) {
+                return user;
             }
-            for (User user: users) {
-                if (user.getName().equals(name)) {
-                    return user;
-                }
-            }
+        }
         return null;
     }
 
@@ -123,10 +117,9 @@ public class DbHandler {
 
     public boolean changeName(int id, String newName) {
         String query = "UPDATE users SET name = ? WHERE id = ?";
-        try(PreparedStatement statement1 = this.connection.prepareStatement(
+        try (PreparedStatement statement1 = this.connection.prepareStatement(
                 query
-        ))
-        {
+        )) {
             statement1.setString(1, newName);
             statement1.setInt(2, id);
             statement1.executeUpdate();
@@ -140,9 +133,10 @@ public class DbHandler {
         }
         return false;
     }
+
     public boolean changePass(int id, String newPass) {
         String query = "UPDATE users SET pass = ? WHERE id = ?";
-        try(PreparedStatement statement = this.connection.prepareStatement(
+        try (PreparedStatement statement = this.connection.prepareStatement(
                 query
         )) {
             statement.setString(1, newPass);
@@ -154,8 +148,6 @@ public class DbHandler {
         } catch (SQLException e) {
             LOGGER.error("Cant pass Update");
             LOGGER.error(e);
-//            e.printStackTrace();
-//            System.out.println("Cant pass Update");
         }
         return false;
     }

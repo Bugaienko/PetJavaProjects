@@ -22,7 +22,7 @@ Configutation:
       level: info
       name: lesson32
       appender-ref:
-        - ref: Console-Appender
+        - ref: File-Appender
 #  logger:
 #      additivity: 'false'
 #      level: trace

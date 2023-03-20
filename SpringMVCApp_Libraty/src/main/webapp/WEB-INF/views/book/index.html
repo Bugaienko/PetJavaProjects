@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>All books</title>
+</head>
+<body>
+<h2>The library has books:</h2>
+<div th:each="book: ${books}">
+  <a th:href="@{/book/{id}(id=${book.book_id})}"
+      th:text="${book.title + ', ' + book.author + ' : ' + book.year}">book</a>
+</div>
+<br/>
+<form th:method="GET" th:action="@{/book/add}">
+  <input type="submit" value="Add book">
+</form>
+<br/>
+<form th:method="GET" th:action="@{/}">
+    <input type="submit" value="MAIN page">
+</form>
+
+</body>
+</html>

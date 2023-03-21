@@ -84,14 +84,14 @@ public class BookController {
     @GetMapping("/{id}/release")
     public String releaseBook(@PathVariable("id") int bookId) {
         bookDao.releaseBook(bookId);
-        return "redirect:/book";
+        return "redirect:/book/" + bookId;
     }
 
     @GetMapping("/{id}/give")
     public String giveBook(@ModelAttribute("person") Person person,
                            @PathVariable("id") int bookId){
         bookDao.giveBookTo(bookId, person);
-        return "redirect:/book";
+        return "redirect:/book/" + bookId;
     }
 
 

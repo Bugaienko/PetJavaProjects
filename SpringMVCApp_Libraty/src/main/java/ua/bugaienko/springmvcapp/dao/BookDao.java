@@ -9,6 +9,7 @@ import ua.bugaienko.springmvcapp.models.Person;
 
 import java.sql.ResultSet;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Sergii Bugaienko
@@ -27,11 +28,11 @@ public class BookDao {
         return jdbcTemplate.query("SELECT * FROM books", new BeanPropertyRowMapper<>(Book.class));
     }
 
-    public Book getById(int bookId) {
+    public Optional<Book> getById(int bookId) {
         return jdbcTemplate.query("SELECT * FROM books WHERE book_id=?",
                 new Object[]{bookId},
                 new BeanPropertyRowMapper<>(Book.class)).
-                stream().findAny().orElse(null);
+                stream().findAny();
     }
 
     public void save(Book book) {

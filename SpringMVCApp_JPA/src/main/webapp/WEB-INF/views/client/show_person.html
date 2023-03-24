@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Client</title>
+</head>
+<body>
+<p th:text="${person.fullName + ', ' + person.yearBirthday}">name</p>
+<td th:switch="${#lists.size(books)}">
+    <span th:case="'0'">The person has no books from the library now</span>
+    <div th:case="*">
+        <h4>Books:</h4>
+        <div th:each="book: ${books}">
+            <a th:href="@{/book/{id}(id=${book.id})}"
+               th:text="${book.title + ', ' + book.author + ' : ' + book.year}">book</a>
+        </div>
+
+    </div>
+</td>
+
+<br/>
+<br/>
+<form th:method="GET" th:action="@{/client/{id}/edit(id=${person.getPersonId()})}">
+    <input type="submit" value="Update">
+</form>
+<form th:method="DELETE" th:action="@{/client/{id}(id=${person.getPersonId()})}">
+    <input type="submit" value="Delete">
+</form>
+<br/>
+<form th:method="GET" th:action="@{/client}">
+    <input type="submit" value="Back">
+</form>
+
+</body>
+</html>

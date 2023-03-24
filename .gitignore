@@ -3,6 +3,11 @@
 .idea
 *.iml
 *.db
+out
+database.properties
+hibernate.cfg.xml
+hibernate.properties
+
 
 *.idea
 /target

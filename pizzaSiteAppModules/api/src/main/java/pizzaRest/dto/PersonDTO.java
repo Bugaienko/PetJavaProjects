@@ -2,7 +2,9 @@ package pizzaRest.dto;
 
 
 
-import ua.bugaienko.pizzaSiteApp.models.Person;
+
+
+import pizzaRest.models.Person;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;

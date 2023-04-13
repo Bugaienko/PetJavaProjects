@@ -1,0 +1,9 @@
+
+server:
+  port: 8000
+
+zuul:
+  routes:
+    order:
+      path: /api/**
+      url: http://localhost:8090

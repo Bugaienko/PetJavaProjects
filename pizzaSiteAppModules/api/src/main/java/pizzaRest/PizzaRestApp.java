@@ -3,13 +3,15 @@ package pizzaRest;
 import org.modelmapper.ModelMapper;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 import org.springframework.context.annotation.Bean;
 
 @SpringBootApplication
-public class PizzaSiteAppApplication {
+@EnableEurekaClient
+public class PizzaRestApp {
 	public static void main(String[] args) {
 
-		SpringApplication.run(PizzaSiteAppApplication.class, args);
+		SpringApplication.run(PizzaRestApp.class, args);
 	}
 
 	@Bean

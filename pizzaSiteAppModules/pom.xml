@@ -16,6 +16,7 @@
     <modules>
         <module>client</module>
         <module>api</module>
+
     </modules>
     <packaging>pom</packaging>
     <properties>
@@ -45,6 +46,7 @@
             </configuration>
             </plugin>
         </plugins>
+
     </build>
 
 </project>
